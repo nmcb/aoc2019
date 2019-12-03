@@ -9,6 +9,9 @@ object Main {
     println("---------------")
     println("D02/1: " + Day02.result1)
     println("D02/2: " + Day02.result2)
+    println("---------------")
+    println("D03/1: " + Day03.result1)
+    println("D03/2: " + Day03.result2)
   }
 
 }
