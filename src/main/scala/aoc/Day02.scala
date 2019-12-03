@@ -37,6 +37,6 @@ object Day02 {
       if interpret(experiment(noun, verb)) == 19690720
     } yield (noun, verb)
 
-  assert(result2.length == 2)
+  assert(result2.length == 1)
     
 }

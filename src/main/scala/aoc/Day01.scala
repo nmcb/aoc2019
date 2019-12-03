@@ -40,6 +40,7 @@ object Day01 {
   }
 
   assert(massToFuel2(12)     == 2)
+  assert(massToFuel2(14)     == 2)
   assert(massToFuel2(1969)   == 966)
   assert(massToFuel2(100756) == 50346)
     
