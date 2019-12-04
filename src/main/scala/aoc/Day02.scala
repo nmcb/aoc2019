@@ -30,13 +30,11 @@ object Day02 {
   def experiment(noun: Int, verb: Int): Seq[Int] =
     prog.updated(1, noun).updated(2, verb)
 
-  val result2: Seq[(Int, Int)] =
-    for {
+  val result2: (Int, Int) =
+    (for {
       noun <- (0 to 99).toSeq
       verb <- (0 to 99).toSeq
       if interpret(experiment(noun, verb)) == 19690720
-    } yield (noun, verb)
-
-  assert(result2.length == 1)
+    } yield (noun, verb)).head
     
 }
