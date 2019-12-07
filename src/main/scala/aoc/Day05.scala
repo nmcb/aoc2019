@@ -74,4 +74,7 @@ object Day05 {
   val result1: Int =
     interpret(program)
     
+  val result2: Int =
+    interpret(program)
+      
 }
