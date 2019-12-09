@@ -75,6 +75,6 @@ object Day05 {
     interpret(program)
     
   val result2: Int =
-    interpret(program)
+    result1
       
 }
