@@ -42,7 +42,7 @@ object Day09 {
   type Sys  = BlockingQueue[Long]
   type Addr = Int
 
-  class Prg(
+  class Prog(
     val name: String,
     val memory: Mem,
     var input: Sys,
@@ -55,9 +55,9 @@ object Day09 {
     final def interpret(mem: Mem, pc: Addr = 0, base: Addr = 0): Unit = {
 
       val op: Op  = Op.fromLong(mem(pc))
-      def value1: Long = value(op.modes._1, pc+1)
-      def value2: Long = value(op.modes._2, pc+2)
-      def value3: Long = value(op.modes._3, pc+3)
+      def value1: Long = get(op.modes._1, pc+1)
+      def value2: Long = get(op.modes._2, pc+2)
+      def value3: Long = get(op.modes._3, pc+3)
 
       def addr1: Addr = address(op.modes._1, pc+1)
       def addr2: Addr = address(op.modes._2, pc+2)
@@ -68,16 +68,17 @@ object Day09 {
         case IM => addr
         case RM => mem(addr).toInt + base
       }
-      def value(mode: Mode, addr: Addr): Long  = mem(address(mode, addr))
-      def setMem(addr: Addr, value: Long): Mem = mem.updated(addr.toInt, value)
+
+      def get(mode: Mode, addr: Addr): Long  = mem(address(mode, addr))
+      def set(addr: Addr, value: Long): Mem = mem.updated(addr.toInt, value)
   
-      def calc(f: (Long, Long) => Long): Mem =
-        setMem(addr3, f(value1, value2))
+      def calc(op: (Long, Long) => Long): Mem =
+        set(addr3, op(value1, value2))
   
       def read(): Mem = {
         val in = input.take() // blocking
         println(s"$name?> ${in}")
-        setMem(addr1, in)
+        set(addr1, in)
       }
   
       def write(): Mem = {
@@ -87,12 +88,13 @@ object Day09 {
       }
   
       def lt(): Mem =
-        if (value1 < value2) setMem(addr3, 1) else setMem(addr3, 0)
+        if (value1 < value2) set(addr3, 1) else set(addr3, 0)
   
       def eq(): Mem =
-        if (value1 == value2) setMem(addr3, 1) else setMem(addr3, 0)
+        if (value1 == value2) set(addr3, 1) else set(addr3, 0)
 
-      def debug: Unit = println(s"pc=$pc,base=$base, op=$op 1:[$addr1]=$value1/2:[$addr2]=$value2/3:[$addr3]=$value3")
+      def debug: Unit =
+        println(s"pc=$pc, base=$base, op=$op, addr=[$addr1, $addr2, $addr3]")
 
       op.code match {
         case 1  => interpret( calc(_+_)   , pc+4 , base)
@@ -118,26 +120,26 @@ object Day09 {
       interpret(memory)      
 
   }
-  object Prg {
-    def apply(name: String, program: Mem, initInput: Mem = Array.empty): Prg = {
+  object Prog {
+    def apply(name: String, program: Mem, initInput: Mem = Array.empty): Prog = {
       val input: Sys = LinkedBlockingQueue[Long]()
-      Prg(name, program, initInput, input)
+      Prog(name, program, initInput, input)
     }
-    def apply(name: String, program: Mem, initInput: Mem, input: Sys): Prg = {
+    def apply(name: String, program: Mem, initInput: Mem, input: Sys): Prog = {
       initInput.forall(input.add(_) == true)
-      new Prg(name, program ++ Array.fill(1024 + 1024)(0L), input)
+      new Prog(name, program ++ Array.fill(1024 + 1024)(0L), input)
     }
     def drain(queue: Sys, acc: List[Long] = Nil): List[Long] = Option(queue.poll()) match {
       case Some(i) => drain(queue, i :: acc)
       case None    => acc.reverse
     }
-    def await(prg: Prg): Unit =
+    def await(prg: Prog): Unit =
       while (!prg.halted) Thread.sleep(10)
   }
 
   def compareWith8(i: Long): Long = {
     val test: Mem = Array(3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99)
-    val a1 = Prg("test", test, Array(i))
+    val a1 = Prog("test", test, Array(i))
     a1.start
     a1.output.take
   }
@@ -154,11 +156,11 @@ object Day09 {
     assert(phases.length == 5)
     assert((0 to 4).forall(phases.contains(_)))
 
-    val a = Prg(s"day7Configuration1-A-${phases(0)}", programDay7, Array(phases(0), init))
-    val b = Prg(s"day7Configuration1-B-${phases(1)}", programDay7, Array(phases(1)), a.output)
-    val c = Prg(s"day7Configuration1-C-${phases(2)}", programDay7, Array(phases(2)), b.output)
-    val d = Prg(s"day7Configuration1-D-${phases(3)}", programDay7, Array(phases(3)), c.output)
-    val e = Prg(s"day7Configuration1-E-${phases(4)}", programDay7, Array(phases(4)), d.output)
+    val a = Prog(s"A1[${phases(0)}]", programDay7, Array(phases(0), init))
+    val b = Prog(s"B1[${phases(1)}]", programDay7, Array(phases(1)), a.output)
+    val c = Prog(s"C1[${phases(2)}]", programDay7, Array(phases(2)), b.output)
+    val d = Prog(s"D1[${phases(3)}]", programDay7, Array(phases(3)), c.output)
+    val e = Prog(s"E1[${phases(4)}]", programDay7, Array(phases(4)), d.output)
 
     a.start
     b.start
@@ -166,7 +168,7 @@ object Day09 {
     d.start
     e.start
 
-    while (!e.halted) Thread.sleep(10)
+    Prog.await(e)
 
     e.output.take
   }
@@ -183,11 +185,11 @@ object Day09 {
     assert(phases.length == 5)
     assert((5L to 9).forall(phases.contains(_)))
 
-    lazy val a = Prg(s"day7Configuration2-A-${phases(0)}", programDay7, Array(phases(0), init))
-    lazy val b = Prg(s"day7Configuration2-B-${phases(1)}", programDay7, Array(phases(1)), a.output)
-    lazy val c = Prg(s"day7Configuration2-C-${phases(2)}", programDay7, Array(phases(2)), b.output)
-    lazy val d = Prg(s"day7Configuration2-D-${phases(3)}", programDay7, Array(phases(3)), c.output)
-    lazy val e = Prg(s"day7Configuration2-E-${phases(4)}", programDay7, Array(phases(4)), d.output)
+    lazy val a = Prog(s"A2[${phases(0)}]", programDay7, Array(phases(0), init))
+    lazy val b = Prog(s"B2[${phases(1)}]", programDay7, Array(phases(1)), a.output)
+    lazy val c = Prog(s"C2[${phases(2)}]", programDay7, Array(phases(2)), b.output)
+    lazy val d = Prog(s"D2[${phases(3)}]", programDay7, Array(phases(3)), c.output)
+    lazy val e = Prog(s"E2[${phases(4)}]", programDay7, Array(phases(4)), d.output)
 
     a.setIn(e.output)
 
@@ -197,14 +199,8 @@ object Day09 {
     d.start
     e.start
 
-    while (!e.halted) Thread.sleep(10)
+    Prog.await(e)
     
-    println(s"A halted: ${a.halted}")
-    println(s"B halted: ${b.halted}")
-    println(s"C halted: ${c.halted}")
-    println(s"D halted: ${d.halted}")
-    println(s"E halted: ${e.halted}")
-
     e.output.take
   }
   val day7Result2 =
@@ -224,37 +220,37 @@ object Day09 {
     // SRB:IM 2019  --b: 0      -> 2019     ; b+19
     // OUT:RM  -35  -->: [1984] -> 666      ; b-35
     // HLT
-    val prg = Prg("testOp9AndRMOp4", Array(109L,2019,204,-35,99) ++ (0  to 1978).map(_ => 0L).toArray ++ Array(666L), Array.empty)
+    val prg = Prog("testOp9AndRMOp4", Array(109L,2019,204,-35,99) ++ (0  to 1978).map(_ => 0L).toArray ++ Array(666L), Array.empty)
     val run = prg.start
-    Prg.await(prg)
+    Prog.await(prg)
     assert( prg.output.take == 666 )
   }
 
   val testQuinn = {
     val quinn = Array(109L,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99)
-    val prg = Prg("testQuinn", quinn, Array.empty)
+    val prg = Prog("testQuinn", quinn, Array.empty)
     val run = prg.start
-    Prg.await(prg)
-    assert( Prg.drain(prg.output) == quinn.toList )
+    Prog.await(prg)
+    assert( Prog.drain(prg.output) == quinn.toList )
   }
         
   val test16DigitAdditionOutput = {
     val multiplyTwoEightDigitNumbers = Array(1102L,34915192,34915192,7,4,7,99,0)
-    val prg = Prg("test16DigitAdditionOutput", multiplyTwoEightDigitNumbers, Array.empty)
+    val prg = Prog("test16DigitAdditionOutput", multiplyTwoEightDigitNumbers, Array.empty)
     val run = prg.start
-    Prg.await(prg)
+    Prog.await(prg)
     assert( prg.output.take.toString.length == 16 )
   }
 
   val test16DigitValueOutput = {
     val output16DigitNumber = Array(104L,1125899906842624L,99)
-    val prg = Prg("test16DigitValueOutput", output16DigitNumber, Array.empty)
+    val prg = Prog("test16DigitValueOutput", output16DigitNumber, Array.empty)
     val run = prg.start
-    Prg.await(prg)
+    Prog.await(prg)
     assert( prg.output.take.toString.length == 16 )
   }
 
-  val test00203 = {
+  val testOp00203 = {
     val read03RM = Array(
       109L,  // 0
          2,  // 1 
@@ -265,26 +261,28 @@ object Day09 {
         99,  // 6
          0   // 7
     )
-    val prg = Prg("test00203", read03RM, Array(666))
+    val prg = Prog("testOp00203", read03RM, Array(666))
     val run = prg.start
-    Prg.await(prg)
+    Prog.await(prg)
     assert( prg.output.take == 666 )
   }
 
   val result1 = {
-    val prg = Prg("result1", program, Array(1L))
+    val prg = Prog("result1", program, Array(1L))
     val run = prg.start
-    Prg.await(prg)
+    Prog.await(prg)
     prg.output.take
   }
 
-  assert(result1 == 2399197539L)
+  assert( result1 == 2399197539L )
   
   val result2 = {
-    val prg = Prg("result2", program, Array(2L))
+    val prg = Prog("result2", program, Array(2L))
     val run = prg.start
-    Prg.await(prg)
+    Prog.await(prg)
     prg.output.take
   }
+
+  assert( result2 == 35106L )
 
 }
