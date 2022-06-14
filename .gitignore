@@ -3,3 +3,4 @@
 .dotty-ide*
 target
 .idea/
+.DS_Store
