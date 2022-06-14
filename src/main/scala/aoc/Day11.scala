@@ -252,6 +252,6 @@
    val space: Future[Space] = Rob.mk()
 
    def result =
-     Await.result(space, 1.seconds)
+     Await.result(space, 1.seconds).nrSetAtLeastOnce
 
  }

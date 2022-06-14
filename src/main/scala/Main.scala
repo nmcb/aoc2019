@@ -36,6 +36,8 @@ import java.util.concurrent.{LinkedBlockingQueue, BlockingQueue}
     // println("D10/1: " + Day10.result1)
     // println("D10/2: " + Day10.result2)
     // println("---------------")
+     println("D11/1: " + Day11.result)
+     println("---------------")
   }
 
 }

@@ -2,3 +2,4 @@
 *.log
 .dotty-ide*
 target
+.idea/
