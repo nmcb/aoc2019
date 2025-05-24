@@ -239,7 +239,7 @@
 
      @scala.annotation.tailrec
      def paint(name: String, i: Int = 0, space: Space = Space(), loc: Loc = Loc(), dir: Dir = N): Space = {
-       println(s"name=$name, thread=${Thread.currentThread.getId}")
+       println(s"name=$name, thread=${Thread.currentThread.threadId()}")
        println(s"loc=$loc, dir=$dir:\n$space")
 
        if (i < 5) paint(name, i+1, space) else space

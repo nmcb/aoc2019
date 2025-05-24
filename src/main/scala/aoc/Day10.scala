@@ -105,9 +105,10 @@ object Day10 {
     if (as.isEmpty && acc.nonEmpty) fireAll(nr)(acc, Nil, count, res)
     else if (as.isEmpty) res
     else {
-      val h :: t = as
-      val l      = t.takeWhile(a => a._1 == h._1)
-      val r      = t.dropWhile(a => a._1 == h._1)
+      val h = as.head
+      val t = as.tail
+      val l = t.takeWhile(a => a._1 == h._1)
+      val r = t.dropWhile(a => a._1 == h._1)
       println(s"[$count] pos=${h._3}")
       fireAll(nr)(r, acc ++ l, count + 1, if (count == nr) Some(h._3) else res)
     }
