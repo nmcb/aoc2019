@@ -43,26 +43,26 @@ object Day03 extends App:
   println(s"Day $day answer part 1: $answer1 [${System.currentTimeMillis - start1}ms]")
 
 
-  type StepCount = (Pos,Int)
+  type Crossing = (Pos,Int)
 
-  extension (count: StepCount)
-    def pos: Pos   = count._1
-    def steps: Int = count._2
+  extension (crossing: Crossing)
+    def pos: Pos   = crossing._1
+    def count: Int = crossing._2
 
-  def minStepOnPosIntersection(count1: Vector[StepCount], count2: Vector[StepCount]): StepCount =
-    val intersections = count1.map(_.pos).toSet.intersect(count2.map(_.pos).toSet).toVector
-    val wireCount1 = count1.filter(count => intersections.contains(count.pos)).toMap
-    val wireCount2 = count2.filter(count => intersections.contains(count.pos)).toMap
+  def minCrossingsOnIntersection(crossings1: Vector[Crossing], crossings2: Vector[Crossing]): Crossing =
+    val intersections = crossings1.map(_.pos).toSet.intersect(crossings2.map(_.pos).toSet).toVector
+    val crossingCount1 = crossings1.filter(crossing => intersections.contains(crossing.pos)).toMap
+    val crossingCount2 = crossings2.filter(crossing => intersections.contains(crossing.pos)).toMap
 
     intersections
-      .map(pos => pos -> (wireCount1(pos) + wireCount2(pos) + 2))
-      .sortWith(_.steps < _.steps)
+      .map(pos => pos -> (crossingCount1(pos) + crossingCount2(pos) + 2))
+      .sortWith(_.count < _.count)
       .head
 
   def solve2(description1: String, description2: String): Int =
-    val count1 = wire(description1).zipWithIndex
-    val count2 = wire(description2).zipWithIndex
-    minStepOnPosIntersection(count1,count2).steps
+    val crossings1 = wire(description1).zipWithIndex
+    val crossings2 = wire(description2).zipWithIndex
+    minCrossingsOnIntersection(crossings1,crossings2).count
 
   val start2 = System.currentTimeMillis
   val answer2 = solve2(description1, description2)
