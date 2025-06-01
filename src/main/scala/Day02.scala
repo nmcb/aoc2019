@@ -1,40 +1,44 @@
-package aoc
+import scala.annotation.tailrec
+import scala.io.Source
 
-object Day02 {
+object Day02 extends App:
 
-  val prog: Seq[Int] = 
-    Seq(1,12,2,3,1,1,2,3,1,3,4,3,1,5,0,3,2,6,1,19,2,19,9,23,1,23,5,27,2,6,27,31,1,31,5,35,1,35,5,39,2,39,6,43,2,43,10,47,1,47,6,51,1,51,6,55,2,55,6,59,1,10,59,63,1,5,63,67,2,10,67,71,1,6,71,75,1,5,75,79,1,10,79,83,2,83,10,87,1,87,9,91,1,91,10,95,2,6,95,99,1,5,99,103,1,103,13,107,1,107,10,111,2,9,111,115,1,115,6,119,2,13,119,123,1,123,6,127,1,5,127,131,2,6,131,135,2,6,135,139,1,139,5,143,1,143,10,147,1,147,2,151,1,151,13,0,99,2,0,14,0)
+  val day = getClass.getSimpleName.filter(_.isDigit).mkString
 
-  // Part 1
+  val program: Vector[Int] =
+    Source.fromResource(s"input$day.txt").mkString.trim.split(",").map(_.toInt).toVector
 
-  def interpret(p: Seq[Int], i: Int = 0): Int = {
 
-    def calc(f: (Int, Int) => Int)(p: Seq[Int]): Seq[Int] =
-      p.updated(p(i+3), f(p(p(i+1)), p(p(i+2))))
-    
-    p(i) match {
-      case 1       => interpret(calc(_+_)(p), i+4)
-      case 2       => interpret(calc(_*_)(p), i+4)
-      case 99      => p(0)
-      case op: Int => throw new RuntimeException("Unknown opcode: " + op)
-    }
-  }
+  def interpret(program: Vector[Int]): Int =
+    @tailrec
+    def go(ip: Int, code: Seq[Int]): Int =
+      code(ip) match
+        case 1 => go(ip + 4, code.updated(code(ip + 3), code(code(ip + 1)) + code(code(ip + 2))))
+        case 2 => go(ip + 4, code.updated(code(ip + 3), code(code(ip + 1)) * code(code(ip + 2))))
+        case 99 => code.head
 
-  assert(interpret(Seq(1,9,10,3,2,3,11,0,99,30,40,50)) == 3500)
+    go(0, program)
 
-  val result1: Int =
-    interpret(prog)
+  val start1 = System.currentTimeMillis
+  val answer1 = interpret(program.updated(1, 12).updated(2, 2))
+  println(s"Day $day answer part 1: $answer1 [${System.currentTimeMillis - start1}ms]")
 
-  // Part 2
 
-  def experiment(noun: Int, verb: Int): Seq[Int] =
-    prog.updated(1, noun).updated(2, verb)
+  def experiment(input: Vector[Int]): Int =
+    val permutations =
+      for
+        noun <- 1 to 99
+        verb <- 1 to 99
+      yield
+        (noun, verb)
 
-  val result2: (Int, Int) =
-    (for {
-      noun <- (0 to 99).toSeq
-      verb <- (0 to 99).toSeq
-      if interpret(experiment(noun, verb)) == 19690720
-    } yield (noun, verb)).head
-    
-}
+    val (noun, verb) =
+      permutations
+        .dropWhile: (noun,verb) =>
+          interpret(input.updated(1, noun).updated(2, verb)) != 19690720
+        .head
+    100 * noun + verb
+
+  val start2 = System.currentTimeMillis
+  val answer2 = experiment(program)
+  println(s"Day $day answer part 2: $answer2 [${System.currentTimeMillis - start1}ms]")
