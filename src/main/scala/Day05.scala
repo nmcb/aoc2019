@@ -59,7 +59,6 @@ object Day05 extends App:
   val answer1 = CPU(mem = program, in = Vector(1)).run.out.last
   println(s"Day $day answer part 1: $answer1 [${System.currentTimeMillis - start1}ms]")
 
-
   val start2 = System.currentTimeMillis
   val answer2 = CPU(mem = program, in = Vector(5)).run.out.last
   println(s"Day $day answer part 2: $answer2 [${System.currentTimeMillis - start1}ms]")
