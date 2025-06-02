@@ -41,8 +41,8 @@ object Day11 extends App:
   import State.*
 
   case class Robot(cpu: CPU, pos: Pos = Pos(0,0), dir: Dir = N, panels: Panels = Panels.empty):
-
-    def paint: Panels =
+    @tailrec
+    final def paint: Panels =
       val run1 = cpu.withInput(panels(pos)).run
       run1.state match
         case Output(color) =>

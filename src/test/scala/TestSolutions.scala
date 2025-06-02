@@ -59,3 +59,8 @@ class TestSolutions extends AnyFunSuite:
         |░█░░█░█░░█░█░█░░█░░░░█░█░░█░░░░█░░█░█░░░░░░
         |░░███░█░░█░█░░█░█░░░░█░░█░████░░██░░████░░░
         |""".stripMargin)(Day11.answer2)
+
+  test("Day12"):
+    assertResult(13045)(Day12.answer1)
+    assertResult(666)(Day12.answer2)
+

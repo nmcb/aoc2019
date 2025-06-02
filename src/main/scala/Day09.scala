@@ -137,4 +137,4 @@ object Day09 extends App:
   
   val start2  = System.currentTimeMillis
   val answer2 = CPU.load(program).withInput(2).allOutput.last
-  println(s"Day $day answer part 2: $answer2 [${System.currentTimeMillis - start1}ms]")
+  println(s"Day $day answer part 2: $answer2 [${System.currentTimeMillis - start2}ms]")
