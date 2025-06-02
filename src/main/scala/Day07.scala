@@ -122,6 +122,7 @@ object Day07 extends App:
   val answer1 = highestSignal(program)
   println(s"Day $day answer part 1: $answer1 [${System.currentTimeMillis - start1}ms]")
 
+  
   def highestSignalWithFeedback(code: Mem): Int =
     @tailrec
     def runner(input: Int)(amplifiers: Seq[CPU]): Int =
