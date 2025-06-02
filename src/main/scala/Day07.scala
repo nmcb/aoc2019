@@ -141,4 +141,4 @@ object Day07 extends App:
 
   val start2  = System.currentTimeMillis
   val answer2 = highestSignalWithFeedback(program)
-  println(s"Day $day answer part 2: $answer2 [${System.currentTimeMillis - start1}ms]")
+  println(s"Day $day answer part 2: $answer2 [${System.currentTimeMillis - start2}ms]")

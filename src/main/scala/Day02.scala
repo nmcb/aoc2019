@@ -41,4 +41,4 @@ object Day02 extends App:
 
   val start2 = System.currentTimeMillis
   val answer2 = experiment(program)
-  println(s"Day $day answer part 2: $answer2 [${System.currentTimeMillis - start1}ms]")
+  println(s"Day $day answer part 2: $answer2 [${System.currentTimeMillis - start2}ms]")

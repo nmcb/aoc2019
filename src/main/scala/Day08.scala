@@ -94,4 +94,4 @@ object Day08 extends App:
 
   val start2  = System.currentTimeMillis
   val answer2 = render(image.map(l => l.map(_.digitToPix)).foldRight(Layer.fill(Trans))(stack))
-  println(s"Day $day answer part 2:\n$answer2 [${System.currentTimeMillis - start1}ms]")
+  println(s"Day $day answer part 2:\n$answer2 [${System.currentTimeMillis - start2}ms]")
