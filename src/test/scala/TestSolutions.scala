@@ -29,3 +29,14 @@ class TestSolutions extends AnyFunSuite:
   test("Day07"):
     assertResult(21760)(Day07.answer1)
     assertResult(69816958)(Day07.answer2)
+
+  test("Day08"):
+    assertResult(1920)(Day08.answer1)
+    assertResult(
+      """███░░░██░░█░░█░█░░░░░██░░
+        |█░░█░█░░█░█░░█░█░░░░█░░█░
+        |█░░█░█░░░░█░░█░█░░░░█░░█░
+        |███░░█░░░░█░░█░█░░░░████░
+        |█░░░░█░░█░█░░█░█░░░░█░░█░
+        |█░░░░░██░░░██░░████░█░░█░
+        |""".stripMargin)(Day08.answer2)
