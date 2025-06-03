@@ -110,6 +110,6 @@ object Day13 extends App:
     go(CPU(program + (0 -> 2L)), GameState(None, None, None, Map.empty.withDefaultValue(Empty)))
 
   val start2  = System.currentTimeMillis
-  val answer2 = play(program, onScreen = true)
+  val answer2 = play(program, onScreen = false)
   println(s"Day $day answer part 2: $answer2 [${System.currentTimeMillis - start2}ms]")
 
