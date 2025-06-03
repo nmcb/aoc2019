@@ -3,6 +3,8 @@ import scala.io.Source
 
 object Day11 extends App:
 
+  import cpu.*
+
   val day = getClass.getSimpleName.filter(_.isDigit).mkString
 
   enum Dir:
@@ -37,41 +39,25 @@ object Day11 extends App:
   object Panels:
     val empty: Panels = Map.empty.withDefaultValue(0L)
 
-  import Day09.*
-  import State.*
-
   case class Robot(cpu: CPU, pos: Pos = Pos(0,0), dir: Dir = N, panels: Panels = Panels.empty):
     @tailrec
     final def paint: Panels =
-      val run1 = cpu.withInput(panels(pos)).run
-      run1.state match
-        case Output(color) =>
-          val run2         = run1.run
-          val Output(turn) = run2.state: @unchecked
-          val rotate       = if turn == 1 then dir.cw else dir.ccw
+      cpu.withInput(panels(pos)).outputStates match
+        case LazyList() =>
+          panels
+        case LazyList((_,color),(next,turn)) =>
+          val rotate = if turn == 1 then dir.cw else dir.ccw
           Robot(
-            cpu    = run2,
+            cpu    = next,
             pos    = pos move rotate,
             dir    = rotate,
             panels = panels.updated(pos, color)
           ).paint
-        case Halted =>
-          panels
-        case _ =>
-          sys.error(s"illegal state=${run1.state}")
 
   val robot: Robot =
-    val program =
-      Source
-        .fromResource(s"input$day.txt")
-        .mkString
-        .trim
-        .split(",")
-        .map(_.toLong)
-        .toVector
-
+    val program: Mem = Mem.parse(Source.fromResource(s"input$day.txt").mkString.trim)
     Robot(
-      cpu    = CPU.load(program),
+      cpu    = CPU(program),
       pos    = Pos(0,0),
       dir    = N,
       panels = Panels.empty
