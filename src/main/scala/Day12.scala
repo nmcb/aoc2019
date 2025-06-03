@@ -47,7 +47,7 @@ object Day12 extends App:
    * The key insights are:  (1) The axes (x,y,z) are totally independent so it suffices to find
    * the period for each axis separately and the answer is the lcm of these.  (2) Each axis will
    * repeat "relatively quickly" (e.g. fast enough to brute force).  And (3) since each state
-   * has a unique parent, the first repeat must be a repeat of state 0.
+   * has a unique parent, the first repeat must be a repeat of the initial state.
    */
 
   extension (a: Long)
@@ -67,11 +67,11 @@ object Day12 extends App:
         vs.forall((a,b) => dimension(a) == dimension(b))
 
       @tailrec
-      def go(next: Vector[Moon], count: Long = 1): Long =
-        val step    = next.step
-        val samePos = same(step.zip(moons).map((a,b) => (a.position, b.position)))
-        val sameVel = same(step.zip(moons).map((a,b) => (a.velocity, b.velocity)))
-        if samePos && sameVel then count else go(next = step, count = count + 1)
+      def go(current: Vector[Moon], count: Long = 1): Long =
+        val next    = current.step
+        val samePos = same(next.zip(moons).map((a,b) => (a.position, b.position)))
+        val sameVel = same(next.zip(moons).map((a,b) => (a.velocity, b.velocity)))
+        if samePos && sameVel then count else go(current = next, count = count + 1)
       go(moons)
 
     def period: Long =
