@@ -2,7 +2,7 @@ package cpu
 
 type Value        = Long
 type Pointer      = Int
-type PointerValue = (Pointer, Value)
+type PointerValue = (Pointer,Value)
 
 extension (pv: PointerValue)
   def pointer: Pointer = pv._1
@@ -51,7 +51,7 @@ case class CPU(mem: Mem, stdin: LazyList[Value] = LazyList.empty, ip: Pointer = 
     copy(stdin = input.to(LazyList))
 
   def withInput(input: LazyList[Value]): CPU =
-    copy(stdin = input)  
+    copy(stdin = input)
 
   def executeOne: Option[State] =
     opcode match
@@ -71,10 +71,10 @@ case class CPU(mem: Mem, stdin: LazyList[Value] = LazyList.empty, ip: Pointer = 
     LazyList.unfold(this)(_.executeOne.map(_.swap)).flatten
 
   def executeAll: LazyList[State] =
-    LazyList.unfold(this)(state => state.executeOne.map(next => (next, next.cpu)))
+    LazyList.unfold(this)(state => state.executeOne.map(next => (next,next.cpu)))
 
   def outputStates: LazyList[(CPU,Value)] =
-    executeAll.flatMap((state, output) => output.map((state, _)))
+    executeAll.flatMap((state,output) => output.map((state,_)))
 
   def execFinal: CPU =
     executeAll.last.cpu
