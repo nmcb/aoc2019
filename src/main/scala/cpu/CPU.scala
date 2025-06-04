@@ -2,7 +2,7 @@ package cpu
 
 type Value        = Long
 type Pointer      = Int
-type PointerValue = (Pointer, Value)
+type PointerValue = (Pointer,Value)
 
 extension (pv: PointerValue)
   def pointer: Pointer = pv._1
@@ -29,23 +29,29 @@ extension (state: State)
 
 case class CPU(mem: Mem, stdin: LazyList[Value] = LazyList.empty, ip: Pointer = 0, base: Pointer = 0):
 
-  def value(offset: Int): Value   = mem(ip + offset)
-  def opcode: Int                 = (value(0) % 100).toInt
-  def param(offset: Int): Value   = value(offset + 1)
-  def paramMode(offset: Int): Int = ((value(0) / math.pow(10, 2 + offset).toInt) % 10).toInt
+  private def value(offset: Int): Value   = mem(ip + offset)
+  private def opcode: Int                 = (value(0) % 100).toInt
+  private def param(offset: Int): Value   = value(offset + 1)
+  private def paramMode(offset: Int): Int = ((value(0) / math.pow(10, 2 + offset).toInt) % 10).toInt
 
-  def read(i: Int): Value =
-    paramMode(i) match
-      case 0 => mem(param(i).toInt)
-      case 1 => param(i)
-      case 2 => mem((base + param(i)).toInt)
-      case _ => sys.error(s"illegal parameter read mode ${paramMode(i)}")
+  private def read(offset: Int): Value =
+    paramMode(offset) match
+      case 0 => mem(param(offset).toInt)
+      case 1 => param(offset)
+      case 2 => mem((base + param(offset)).toInt)
+      case _ => sys.error(s"illegal parameter read mode ${paramMode(offset)}")
 
-  def write(i: Int, value: Value): Mem =
-    paramMode(i) match
-      case 0 => mem.updated(param(i).toInt, value)
-      case 2 => mem.updated((base + param(i)).toInt, value)
-      case _ => sys.error(s"illegal parameter write mode ${paramMode(i)}")
+  private def write(offset: Int, value: Value): Mem =
+    paramMode(offset) match
+      case 0 => mem.updated(param(offset).toInt, value)
+      case 2 => mem.updated((base + param(offset)).toInt, value)
+      case _ => sys.error(s"illegal parameter write mode ${paramMode(offset)}")
+
+  def withInput(input: Value*): CPU =
+    copy(stdin = input.to(LazyList))
+
+  def withInput(input: LazyList[Value]): CPU =
+    copy(stdin = input)
 
   def executeOne: Option[State] =
     opcode match
@@ -65,10 +71,10 @@ case class CPU(mem: Mem, stdin: LazyList[Value] = LazyList.empty, ip: Pointer = 
     LazyList.unfold(this)(_.executeOne.map(_.swap)).flatten
 
   def executeAll: LazyList[State] =
-    LazyList.unfold(this)(state => state.executeOne.map(next => (next, next.cpu)))
+    LazyList.unfold(this)(state => state.executeOne.map(next => (next,next.cpu)))
 
   def outputStates: LazyList[(CPU,Value)] =
-    executeAll.flatMap((state, output) => output.map((state, _)))
+    executeAll.flatMap((state,output) => output.map((state,_)))
 
   def execFinal: CPU =
     executeAll.last.cpu

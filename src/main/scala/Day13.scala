@@ -82,10 +82,10 @@ object Day13 extends App:
       buffer += Reset
 
       println(buffer.mkString)
-      Thread.sleep(5)
+      Thread.sleep(20)
 
 
-  def play(program: Mem, onScreen: Boolean = false): Value =
+  def play(program: Mem, onScreen: Boolean): Value =
     @tailrec
     def go(cpu: CPU, game: GameState): Value =
       val executions = cpu.executeAll
@@ -108,6 +108,5 @@ object Day13 extends App:
     go(CPU(program + (0 -> 2L)), GameState(None, None, None, Map.empty.withDefaultValue(Empty)))
 
   val start2  = System.currentTimeMillis
-  val answer2 = play(program)
+  val answer2 = play(program, onScreen = false)
   println(s"Day $day answer part 2: $answer2 [${System.currentTimeMillis - start2}ms]")
-
