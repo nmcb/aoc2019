@@ -11,7 +11,6 @@ object Day03 extends App:
       .toVector
 
   case class Pos(x: Int, y: Int):
-
     def manhattan: Int = math.abs(x) + math.abs(y)
 
   object Pos:
