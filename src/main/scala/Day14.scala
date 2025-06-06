@@ -40,37 +40,37 @@ object Day14 extends App:
 
     def makeFuel(amount: Amount): Amount =
 
-      def make(molecule: Molecule, amount: Amount, required: Molecules): Molecules =
-        if required(molecule) >= amount || molecule == "ORE" then
-          required.modify(molecule, -amount)
+      def make(molecule: Molecule, amount: Amount, current: Molecules): Molecules =
+        if current(molecule) >= amount || molecule == "ORE" then
+          current.modify(molecule, -amount)
         else
-          val additional = amount - required(molecule)
-          val multiplier = additional /^  reactions(molecule).amount
+          val additional = amount - current(molecule)
+          val multiplier = additional /^ reactions(molecule).amount
           reactions(molecule)
             .from
-            .foldLeft(required):
-              case (molecules,(molecule,amount)) => make(molecule, amount * multiplier, molecules)
+            .foldLeft(current):
+              case (current,(molecule,amount)) => make(molecule, amount * multiplier, current)
             .modify(molecule, multiplier * reactions(molecule).amount - amount)
 
       val result = make("FUEL", amount, Map.empty.withDefaultValue(0L))
       -result("ORE")
 
-    def makeMaxFuel(oreThreshhold: Amount): Amount =
-
+    def makeMaxFuel(oreThreshold: Amount): Amount =
+      @tailrec
       def binarySearch(start: Amount, end: Amount): Amount =
         if start >= end then
           start
         else
           val middle = (start + end) / 2
           val cost   = reactions.makeFuel(middle)
-          if cost > oreThreshhold then
+          if cost > oreThreshold then
             binarySearch(start, middle - 1)
-          else if cost < oreThreshhold then
+          else if cost < oreThreshold then
             binarySearch(middle + 1, end)
           else
             middle
 
-      binarySearch (1, oreThreshhold)
+      binarySearch (1, oreThreshold)
 
 
   val reactions: Reactions =
@@ -86,8 +86,6 @@ object Day14 extends App:
   val start1  = System.currentTimeMillis
   val answer1 = reactions.makeFuel(1)
   println(s"Day $day answer part 1: $answer1 [${System.currentTimeMillis - start1}ms]")
-
-
 
   val start2  = System.currentTimeMillis
   val answer2 = reactions.makeMaxFuel(1000000000000L)
