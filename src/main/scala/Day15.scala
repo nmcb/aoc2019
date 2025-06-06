@@ -20,7 +20,7 @@ object Day15 extends App:
   def dijkstra(cpu: CPU): (Map[Pos,Int], Option[(Pos,CPU)]) =
     val steps = mutable.Map(Pos(0,0) -> 0)
     val todo  = mutable.PriorityQueue(Pos(0,0) -> cpu)(using Ordering.by((point, _) => steps(point)))
-    var target = Option.empty[(Pos, CPU)]
+    var target = Option.empty[(Pos,CPU)]
 
     while todo.nonEmpty do
       val (from, cpu) = todo.dequeue
