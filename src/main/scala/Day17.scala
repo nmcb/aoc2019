@@ -53,39 +53,40 @@ object Day17 extends App:
   extension (grid: Grid)
 
     def findRobot: (Pos,Pos) =
-      def parseRobotDirection(cell: Char): Option[Pos] = cell match
-        case '>' => Some(Pos(1,0))
-        case '<' => Some(Pos(-1,0))
-        case 'v' => Some(Pos(0,1))
-        case '^' => Some(Pos(0,-1))
-        case _   => None
+      def parseRobotDirection(tile: Char): Option[Pos] =
+        tile match
+          case '>' => Some(Pos(1,0))
+          case '<' => Some(Pos(-1,0))
+          case 'v' => Some(Pos(0,1))
+          case '^' => Some(Pos(0,-1))
+          case _   => None
 
       val robots =
         for
-          (row, y) <- grid.view.zipWithIndex
-          (cell, x) <- row.view.zipWithIndex
-          pos = Pos(x,y)
-          direction <- parseRobotDirection(cell)
+          (row, y)  <- grid.view.zipWithIndex
+          (tile, x) <- row.view.zipWithIndex
+          direction <- parseRobotDirection(tile)
         yield
-          (pos, direction)
+          (Pos(x,y), direction)
+
       robots.head
 
     def getPath: Path =
 
-      def getCell(pos: Pos): Char =
+      def getTile(pos: Pos): Char =
         if (0 <= pos.x && 0 <= pos.y && pos.y < grid.size && pos.x < grid(pos.y).size)
           grid(pos.y)(pos.x)
         else
           '.'
 
       def go(pos: Pos, direction: Pos): Path =
-        if getCell(pos + direction) == '#' then
+        if getTile(pos + direction) == '#' then
           go(pos + direction, direction) match
             case Forward(n) :: tl => Forward(n + 1) :: tl
             case tl => Forward(1) :: tl
-        else if getCell(pos + direction.left) == '#' then
+        else if getTile(pos + direction.left) == '#' then
           Left :: go(pos, direction.left)
-        else if getCell(pos + direction.right) == '#' then
+        else if getTile(pos + direction.right) == '#' then
           Right :: go(pos, direction.right)
         else
           Nil
@@ -130,7 +131,7 @@ object Day17 extends App:
         (pathPart, i) <- pathParts.iterator.zipWithIndex
         if path.startsWith(pathPart)
         tailPath = path.drop(pathPart.size)
-        tailMainPath <- reconstructMainPaths(tailPath, pathParts)
+        tailMainPath  <- reconstructMainPaths(tailPath, pathParts)
       yield
         i :: tailMainPath
 
@@ -138,13 +139,12 @@ object Day17 extends App:
     mainPath.map(i => ('A' + i).toChar).mkString(",")
 
   def dustCollected(program: Mem, grid: Grid): Int =
-    val path = getPath(grid)
+    val path      = getPath(grid)
     val pathParts = factorPathParts(Seq(path)).next
-    val mainPath = reconstructMainPaths(path, pathParts).next
+    val mainPath  = reconstructMainPaths(path, pathParts).next
 
-    val newProgram = program + (0 -> 2L)
-
-    val mainPathString = mainPathToString(mainPath)
+    val newProgram      = program + (0 -> 2L)
+    val mainPathString  = mainPathToString(mainPath)
     val pathPartsString = pathParts.map(pathToString).mkString("\n")
     val inputString =
       s"""$mainPathString
@@ -157,12 +157,6 @@ object Day17 extends App:
 
   def dustCollected(program: Mem): Int =
     dustCollected(program, parseInputGrid(program))
-
-  def printGrid(grid: Grid): Unit =
-    for (row <- grid)
-      for (cell <- row)
-        print(cell)
-      println()
 
   def parseGrid(input: String): Grid =
     input.linesIterator.map(_.toVector).toVector
