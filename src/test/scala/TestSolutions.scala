@@ -101,5 +101,5 @@ class TestSolutions extends AnyFunSuite:
     assertResult(1139528802)(Day21.answer2)
 
   test("Day22"):
-    assertResult(7171)(Day21.answer1)
-    assertResult(73394009116480L)(Day21.answer2)
+    assertResult(7171)(Day22.answer1)
+    assertResult(73394009116480L)(Day22.answer2)

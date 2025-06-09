@@ -9,7 +9,6 @@ object Day22 extends App:
    *
    * @see Credits - https://github.com/maneatingape
    */
-
   case class Technique(a: BigInt, c: BigInt, m: BigInt):
     def mod(n: BigInt) =
       n % m
@@ -40,19 +39,12 @@ object Day22 extends App:
         case Array("cut", n)        => Technique(1, size - n.toLong, size)
       .reduce(_ merge _)
 
-  def solve1(input: Seq[String]): Long =
-    solve(input, 10007).shuffle(2019)
-
-  val rules: Seq[String] =
-    Source.fromResource(s"input$day.txt").getLines.toSeq
+  val rules: Seq[String] = Source.fromResource(s"input$day.txt").getLines.toSeq
 
   val start1  = System.currentTimeMillis
-  val answer1 = solve1(rules)
+  val answer1 = solve(rules, 10007).shuffle(2019)
   println(s"Day $day answer part 1: $answer1 [${System.currentTimeMillis - start1}ms]")
 
-  def solve2(input: Seq[String]): Long =
-    solve(input, 119315717514047L).inverse.pow(101741582076661L).shuffle(2020)
-
   val start2  = System.currentTimeMillis
-  val answer2 = solve2(rules)
+  val answer2 = solve(rules, 119315717514047L).inverse.pow(101741582076661L).shuffle(2020)
   println(s"Day $day answer part 2: $answer2 [${System.currentTimeMillis - start2}ms]")
